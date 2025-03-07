@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { HeaderComponent } from '../shared/header/header.component';
 import { environment } from '../../../environments/environment';
 import { Chart, registerables } from 'chart.js';
 
@@ -51,7 +50,7 @@ interface SubmissionWithResponses {
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.scss']
 })
