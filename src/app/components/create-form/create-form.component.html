@@ -1,0 +1,274 @@
+<div class="create-form-container">
+  <header class="form-header">
+    <div class="header-left">
+      <button class="back-button" (click)="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#333">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        <span>{{ formName }}</span>
+      </button>
+      <span *ngIf="hasUnsavedChanges" class="unsaved-changes">(Unsaved changes)</span>
+    </div>
+    <div class="header-actions">
+      <button class="cancel-button" (click)="goBack()">Cancel</button>
+      <button class="publish-button" (click)="saveForm()" [disabled]="isCreatingForm || formFields.length === 0">
+        {{ isEditMode ? 'Save Changes' : 'Publish Form' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="form-builder-content">
+    <!-- Left Panel: Form Settings -->
+    <div class="form-settings-panel">
+      <h2>Form Settings</h2>
+      
+      <div class="form-group">
+        <label for="formName">Form Name*</label>
+        <input type="text" id="formName" [(ngModel)]="formName" (ngModelChange)="onFieldChange()" placeholder="Enter form name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="formDescription">Description</label>
+        <textarea id="formDescription" [(ngModel)]="formDescription" (ngModelChange)="onFieldChange()" placeholder="Enter form description" rows="4"></textarea>
+      </div>
+
+      <div class="formify-elements">
+        <h2>Formify Elements</h2>
+        
+        <div class="element-category">
+          <h3>Text Inputs</h3>
+          <div class="element-items">
+            <div class="element-item" (click)="addNewField('text')">
+              <div class="element-icon text-field-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/>
+                </svg>
+              </div>
+              <span>Text Field</span>
+            </div>
+            
+            <div class="element-item" (click)="addNewField('email')">
+              <div class="element-icon email-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </div>
+              <span>Email</span>
+            </div>
+            
+            <div class="element-item" (click)="addNewField('number')">
+              <div class="element-icon number-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M13 7.5h5v2h-5zm0 7h5v2h-5zM19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM11 6H6v5h5V6zm-1 4H7V7h3v3zm1 3H6v5h5v-5zm-1 4H7v-3h3v3z"/>
+                </svg>
+              </div>
+              <span>Number</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="element-category">
+          <h3>Choice Inputs</h3>
+          <div class="element-items">
+            <div class="element-item" (click)="addNewField('checkbox')">
+              <div class="element-icon checkbox-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <span>Checkbox</span>
+            </div>
+            
+            <div class="element-item" (click)="addNewField('radio')">
+              <div class="element-icon radio-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                </svg>
+              </div>
+              <span>Radio</span>
+            </div>
+            
+            <div class="element-item" (click)="addNewField('dropdown')">
+              <div class="element-icon dropdown-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </div>
+              <span>Dropdown</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="element-category">
+          <h3>Special Inputs</h3>
+          <div class="element-items">
+            <div class="element-item" (click)="addNewField('date')">
+              <div class="element-icon date-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                </svg>
+              </div>
+              <span>Date</span>
+            </div>
+            
+            <div class="element-item" (click)="addNewField('file')">
+              <div class="element-icon file-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+                </svg>
+              </div>
+              <span>File Upload</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Middle Panel: Form Preview -->
+    <div class="form-preview-panel">
+      <div class="form-preview-container" [class.empty]="formFields.length === 0">
+        <div *ngIf="formFields.length === 0" class="empty-form-state">
+          <div class="add-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="#ccc">
+              <path d="M0 0h24v24H0z" fill="none"/>
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+          </div>
+          <p class="start-building">Start building your Formify form</p>
+          <p class="drag-drop-hint">Drag and drop elements from the left panel</p>
+        </div>
+        
+        <div *ngIf="formFields.length > 0" class="form-fields">
+          <div class="field-item" *ngFor="let field of formFields; let i = index" (click)="selectField(i)">
+            <div class="field-content" [class.selected]="selectedFieldIndex === i">
+              <div class="field-type-icon">
+                <svg *ngIf="field.field_type === 'text'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'email'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'number'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M13 7.5h5v2h-5zm0 7h5v2h-5zM19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM11 6H6v5h5V6zm-1 4H7V7h3v3zm1 3H6v5h5v-5zm-1 4H7v-3h3v3z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'checkbox'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'radio'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'dropdown'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'date'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                </svg>
+                <svg *ngIf="field.field_type === 'file'" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#333">
+                  <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>
+                </svg>
+              </div>
+              <div class="field-info">
+                <span class="field-label">{{ field.label }}</span>
+                <span class="field-type">{{ field.field_type | titlecase }}</span>
+              </div>
+              <div class="field-actions">
+                <button class="delete-button" (click)="deleteField(i); $event.stopPropagation();">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#999">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Add Field button at the bottom of the form fields -->
+          <div class="add-field-button" (click)="addNewField('text')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#2E7D32">
+              <path d="M0 0h24v24H0z" fill="none"/>
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            <span>Add Field</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Panel: Field Settings -->
+    <div class="field-settings-panel" [class.hidden]="selectedFieldIndex === -1">
+      <h2>Field Settings</h2>
+      
+      <div *ngIf="selectedFieldIndex !== -1">
+        <div class="form-group">
+          <label for="fieldLabel">Field Label</label>
+          <input type="text" id="fieldLabel" [(ngModel)]="formFields[selectedFieldIndex].label" (ngModelChange)="onFieldChange()" placeholder="Enter field label">
+        </div>
+        
+        <div class="form-group">
+          <label for="fieldType">Field Type</label>
+          <select id="fieldType" [(ngModel)]="formFields[selectedFieldIndex].field_type" (ngModelChange)="onFieldChange()" class="field-type-select">
+            <option value="text">Text</option>
+            <option value="email">Email</option>
+            <option value="number">Number</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="radio">Radio</option>
+            <option value="dropdown">Dropdown</option>
+            <option value="date">Date</option>
+            <option value="file">File</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="toggle-label">Required Field</label>
+          <div class="toggle-switch">
+            <input type="checkbox" id="requiredField" [(ngModel)]="formFields[selectedFieldIndex].required" (ngModelChange)="onFieldChange()">
+            <label for="requiredField" class="toggle"></label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="placeholderText">Placeholder Text</label>
+          <input type="text" id="placeholderText" [(ngModel)]="formFields[selectedFieldIndex].placeholder" (ngModelChange)="onFieldChange()" placeholder="Enter your name">
+        </div>
+        
+        <!-- Options for choice fields (radio, checkbox, dropdown) -->
+        <div class="form-group" *ngIf="['radio', 'checkbox', 'dropdown'].includes(formFields[selectedFieldIndex].field_type)">
+          <label for="fieldOptions">Options</label>
+          <textarea id="fieldOptions" [(ngModel)]="formFields[selectedFieldIndex].options" (ngModelChange)="onFieldChange()" placeholder="Option 1,Option 2,Option 3" rows="4"></textarea>
+          <small class="help-text">Enter options separated by commas</small>
+        </div>
+        
+        <button class="delete-field-button" (click)="deleteField(selectedFieldIndex)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#d32f2f">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+          </svg>
+          Delete Field
+        </button>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- Loading and message indicators -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  
+  <div *ngIf="errorMessage" class="message error-message">
+    {{ errorMessage }}
+  </div>
+  
+  <div *ngIf="successMessage" class="message success-message">
+    {{ successMessage }}
+  </div>
+</div>

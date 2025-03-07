@@ -1,0 +1,118 @@
+<div class="analytics-container">
+  <div class="back-button" (click)="navigateToHome()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 12H5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="analytics-header">
+    <h1>Form Analytics</h1>
+    <div class="form-controls">
+      <div class="form-selector">
+        <label for="formSelect">Select Form:</label>
+        <select id="formSelect" [(ngModel)]="selectedFormId" (change)="onFormChange()">
+          <option *ngFor="let form of forms" [value]="form.id">{{ form.name }}</option>
+        </select>
+      </div>
+      
+      <div class="date-filter">
+        <label for="startDate">From:</label>
+        <input type="date" id="startDate" [(ngModel)]="dateFilter.start" (change)="onDateFilterChange()">
+        
+        <label for="endDate">To:</label>
+        <input type="date" id="endDate" [(ngModel)]="dateFilter.end" (change)="onDateFilterChange()">
+      </div>
+      
+      <button class="export-btn" (click)="exportToCsv()">
+        <i class="fas fa-download"></i> Export to CSV
+      </button>
+    </div>
+  </div>
+  
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading analytics data...</p>
+  </div>
+  
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+  
+  <div *ngIf="!isLoading && !error && selectedFormId" class="analytics-content">
+    <!-- Key Metrics -->
+    <div class="metrics-container">
+      <div class="metric-card">
+        <div class="metric-value">{{ getTotalSubmissions() }}</div>
+        <div class="metric-label">Total Submissions</div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-value">{{ getCompletionRate() | number:'1.0-1' }}%</div>
+        <div class="metric-label">Completion Rate</div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-value">{{ getAverageFieldsPerSubmission() | number:'1.0-1' }}</div>
+        <div class="metric-label">Avg. Fields per Submission</div>
+      </div>
+    </div>
+    
+    <!-- No Data Message -->
+    <div *ngIf="submissions.length === 0" class="no-data-message">
+      <p>No submissions found for the selected form and date range.</p>
+    </div>
+    
+    <!-- Charts Section -->
+    <div *ngIf="submissions.length > 0" class="charts-container">
+      <div class="chart-row">
+        <!-- Submission Timeline -->
+        <div class="chart-card timeline-chart">
+          <h2>Submissions Over Time</h2>
+          <div class="chart-wrapper">
+            <canvas id="submissionTimelineChart"></canvas>
+          </div>
+        </div>
+        
+        <!-- Field Completion Rates -->
+        <div class="chart-card field-completion-chart">
+          <h2>Field Completion Rates</h2>
+          <div class="chart-wrapper">
+            <canvas id="fieldCompletionChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Response Distribution Charts -->
+      <div class="chart-row">
+        <div class="chart-card response-distribution-charts">
+          <h2>Response Distribution</h2>
+          <div id="responseDistributionCharts" class="distribution-charts-container">
+            <!-- Charts will be dynamically added here -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Responses Table -->
+    <div *ngIf="submissions.length > 0" class="responses-table-container">
+      <h2>Individual Responses</h2>
+      
+      <table class="responses-table">
+        <thead>
+          <tr>
+            <th>Submission Date</th>
+            <th *ngFor="let field of fields">{{ field.label }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let submission of submissions">
+            <td>{{ submission.submitted_at | date:'medium' }}</td>
+            <td *ngFor="let field of fields">
+              {{ getResponseForField(submission.id, field.id) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,249 @@
+<div class="form-submission-container">
+  <header class="header">
+    <button class="back-button" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000" width="24" height="24">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+      </svg>
+    </button>
+    <h1 *ngIf="form">{{ form.name }}</h1>
+    <h1 *ngIf="!form">Form Submission</h1>
+    <div class="user-avatar" *ngIf="form">
+      <img src="https://ui-avatars.com/api/?name=User&background=4CAF50&color=fff" alt="User Avatar">
+    </div>
+  </header>
+
+  <div class="form-content">
+    <div *ngIf="isLoading" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading form...</p>
+    </div>
+
+    <div *ngIf="!isLoading && form" class="form-details">
+      <div class="form-instructions" *ngIf="!showSummary">
+        <p>Please complete this form to initiate your onboarding process. This information
+        will be used to set up your employee profile and system access.</p>
+        <p class="required-note">Fields marked with an asterisk (*) are required</p>
+      </div>
+
+      <!-- Summary View -->
+      <div *ngIf="showSummary" class="form-summary">
+        <h2 class="summary-title">Review Your Information</h2>
+        <p class="summary-instructions">Please review the information you've entered before submitting.</p>
+        
+        <div class="summary-content">
+          <div *ngFor="let item of formSummary" class="summary-item">
+            <div class="summary-label">{{ item.label }}</div>
+            <div class="summary-value">{{ item.value || 'Not provided' }}</div>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="submissionForm" (ngSubmit)="submitForm()">
+        <div class="form-sections" *ngIf="!showSummary">
+          <!-- Personal Information Section -->
+          <div class="form-section" *ngIf="hasFieldsOfType(['text', 'email'])">
+            <h2 class="section-title">Personal Information</h2>
+            
+            <div *ngFor="let field of getFieldsByType(['text', 'email'])" class="form-field">
+              <label [for]="field.id">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-marker">*</span>
+              </label>
+
+              <input 
+                [id]="field.id"
+                [type]="field.field_type === 'email' ? 'email' : 'text'"
+                [formControlName]="field.id!"
+                [placeholder]="field.placeholder || ''"
+                [ngClass]="{'invalid': isFieldInvalid(field.id!)}"
+              >
+
+              <div *ngIf="isFieldInvalid(field.id!)" class="error-message">
+                <span *ngIf="field.required && submissionForm.get(field.id!)?.hasError('required')">This field is required</span>
+                <span *ngIf="field.field_type === 'email' && submissionForm.get(field.id!)?.hasError('email')">Please enter a valid email address</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date Fields Section -->
+          <div class="form-section" *ngIf="hasFieldsOfType(['date'])">
+            <div *ngFor="let field of getFieldsByType(['date'])" class="form-field">
+              <label [for]="field.id">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-marker">*</span>
+              </label>
+
+              <div class="date-input-container">
+                <input 
+                  [id]="field.id"
+                  type="date"
+                  [formControlName]="field.id!"
+                  [ngClass]="{'invalid': isFieldInvalid(field.id!)}"
+                >
+                <span class="calendar-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V9h14v10zm0-12H5V5h14v2zM7 11h5v5H7z" fill="#666"/>
+                  </svg>
+                </span>
+              </div>
+
+              <div *ngIf="isFieldInvalid(field.id!)" class="error-message">
+                <span *ngIf="field.required">This field is required</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dropdown Fields Section -->
+          <div class="form-section" *ngIf="hasFieldsOfType(['dropdown'])">
+            <div *ngFor="let field of getFieldsByType(['dropdown'])" class="form-field">
+              <label [for]="field.id">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-marker">*</span>
+              </label>
+
+              <div class="select-container">
+                <select 
+                  [id]="field.id"
+                  [formControlName]="field.id!"
+                  [ngClass]="{'invalid': isFieldInvalid(field.id!)}"
+                >
+                  <option value="">Select {{ field.label }}</option>
+                  <option *ngFor="let option of field.options?.split(',')" [value]="option.trim()">
+                    {{ option.trim() }}
+                  </option>
+                </select>
+                <span class="select-arrow"></span>
+              </div>
+
+              <div *ngIf="isFieldInvalid(field.id!)" class="error-message">
+                <span *ngIf="field.required">This field is required</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Information Section -->
+          <div class="form-section" *ngIf="hasFieldsOfType(['number'])">
+            <h2 class="section-title">Additional Information</h2>
+            
+            <div *ngFor="let field of getFieldsByType(['number'])" class="form-field">
+              <label [for]="field.id">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-marker">*</span>
+              </label>
+
+              <input 
+                [id]="field.id"
+                type="number"
+                [formControlName]="field.id!"
+                [placeholder]="field.placeholder || ''"
+                [ngClass]="{'invalid': isFieldInvalid(field.id!)}"
+              >
+
+              <div *ngIf="isFieldInvalid(field.id!)" class="error-message">
+                <span *ngIf="field.required">This field is required</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkbox Fields Section -->
+          <div class="form-section" *ngIf="hasFieldsOfType(['checkbox'])">
+            <div *ngFor="let field of getFieldsByType(['checkbox'])" class="form-field checkbox-field">
+              <label class="field-label">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-marker">*</span>
+              </label>
+              
+              <div class="checkbox-options">
+                <ng-container *ngIf="field.options && field.options.split(',').length > 0">
+                  <div *ngFor="let option of field.options.split(',')" class="checkbox-container">
+                    <input 
+                      type="checkbox"
+                      [id]="field.id + '_' + option.trim()"
+                      [checked]="isCheckboxChecked(field.id!, option.trim())"
+                      (change)="updateCheckboxValue(field.id!, option.trim(), $event)"
+                    >
+                    <label [for]="field.id + '_' + option.trim()">{{ option.trim() }}</label>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div *ngIf="isFieldInvalid(field.id!)" class="error-message">
+                <span *ngIf="field.required">This field is required</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Radio Fields Section -->
+          <div class="form-section" *ngIf="hasFieldsOfType(['radio'])">
+            <div *ngFor="let field of getFieldsByType(['radio'])" class="form-field radio-field">
+              <label class="field-label">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required-marker">*</span>
+              </label>
+              
+              <div class="radio-options">
+                <div *ngFor="let option of field.options?.split(',')" class="radio-option">
+                  <input 
+                    type="radio"
+                    [id]="field.id + '_' + option.trim()"
+                    [name]="field.id!"
+                    [value]="option.trim()"
+                    [formControlName]="field.id!"
+                  >
+                  <label [for]="field.id + '_' + option.trim()">{{ option.trim() }}</label>
+                </div>
+              </div>
+
+              <div *ngIf="isFieldInvalid(field.id!)" class="error-message">
+                <span *ngIf="field.required">This field is required</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="error-message form-error">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-footer">
+          <div class="powered-by">Powered by Formify</div>
+          
+          <div class="button-group" *ngIf="showSummary">
+            <button 
+              type="button" 
+              class="edit-button" 
+              (click)="editForm()"
+              [disabled]="isSubmitting"
+            >
+              Edit Information
+            </button>
+            <button 
+              type="submit" 
+              class="submit-button" 
+              [disabled]="isSubmitting"
+            >
+              <span *ngIf="!isSubmitting">Confirm & Submit</span>
+              <span *ngIf="isSubmitting">Submitting...</span>
+            </button>
+          </div>
+          
+          <button 
+            *ngIf="!showSummary"
+            type="submit" 
+            class="submit-button" 
+            [disabled]="submissionForm.invalid || isSubmitting"
+          >
+            <span>Continue</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div *ngIf="!isLoading && !form && errorMessage" class="error-state">
+      <p>{{ errorMessage }}</p>
+      <button (click)="goBack()" class="back-link">Go Back</button>
+    </div>
+  </div>
+</div>

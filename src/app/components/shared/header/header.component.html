@@ -1,0 +1,9 @@
+<header class="app-header">
+    <div class="user-actions">
+      <ng-container *ngIf="isLoggedIn">
+        <div class="user-info">
+          <button class="logout-button" (click)="logout()">Logout</button>
+        </div>
+      </ng-container>
+    </div>
+</header>

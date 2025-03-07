@@ -1,0 +1,72 @@
+<div class="confirmation-container">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Loading confirmation details...</p>
+  </div>
+
+  <div *ngIf="!isLoading && submission" class="confirmation-content">
+    <div class="success-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4CAF50" width="84" height="84">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-13l-4 4 1.41 1.41L10 9.83l6.59 6.59L18 15l-8-8z"/>
+      </svg>
+    </div>
+    
+    <h1 class="confirmation-title">Form Submitted Successfully!</h1>
+    
+    <p class="confirmation-message">
+      Thank you for submitting the form <strong>"{{ formName }}"</strong>. Your response has been recorded.
+    </p>
+    
+    <div class="submission-details">
+      <div class="detail-item">
+        <span class="detail-label">Submission ID</span>
+        <span class="detail-value">{{ submissionId }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Submitted on</span>
+        <span class="detail-value">{{ submission.created_at | date:'medium' }}</span>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="primary-button" (click)="viewAllForms()">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#FFFFFF">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M4 14h4v-4H4v4zm0 5h4v-4H4v4zM4 9h4V5H4v4zm5 5h12v-4H9v4zm0 5h12v-4H9v4zM9 5v4h12V5H9z"/>
+        </svg>
+        View All Forms
+      </button>
+      <button class="secondary-button" (click)="createNewForm()">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#4CAF50">
+          <path d="M0 0h24v24H0V0z" fill="none"/>
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Create New Form
+      </button>
+    </div>
+    
+    <div class="powered-by">Powered by Formify</div>
+  </div>
+
+  <div *ngIf="!isLoading && !submission && errorMessage" class="error-state">
+    <div class="error-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#F44336" width="84" height="84">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+      </svg>
+    </div>
+    
+    <h1 class="error-title">Something Went Wrong</h1>
+    
+    <p class="error-message">{{ errorMessage }}</p>
+    
+    <button class="primary-button" (click)="goToHome()">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="#FFFFFF">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/>
+      </svg>
+      Go to Home
+    </button>
+  </div>
+</div>
